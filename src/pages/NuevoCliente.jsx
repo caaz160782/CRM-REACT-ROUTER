@@ -1,6 +1,8 @@
-import { useNavigate,Form , useActionData } from "react-router-dom"
+/* eslint-disable no-control-regex */
+import { useNavigate,Form , useActionData, redirect } from "react-router-dom"
 import Formulario from "../components/Formulario";
 import Error from "../components/Error";
+import { agregarClientes } from "../data/Clientes";
 
 export async function action({request}){
   const formData= await request.formData();
@@ -8,17 +10,27 @@ export async function action({request}){
   const datos = Object.fromEntries(formData);
    // console.log(datos)
   // validacion 
+ const email = formData.get('email');
   const errores=[];
   if(Object.values(datos).includes('')){
     errores.push('Todos los campos son obligatorios');
   }
   //console.log(errores)
+
+  // eslint-disable-next-line no-useless-escape
+  let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+
+  if(!regex.test(email)){
+    errores.push('El Email no es valido');
+  }
+  
   if(Object.keys(errores).length){
     return errores;
   }
   
-
-  return { ok: true };
+  await agregarClientes(datos);
+  
+  return redirect('/');
 }
 
 const NuevoCliente = () => {
