@@ -1,6 +1,15 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
+import { useNavigate,Form,redirect } from "react-router-dom";
+import { eliminarCliente } from "../data/Clientes";
+
+export async function action({params}){
+  await  eliminarCliente(params.clienteid);
+  return redirect('/');
+}
+
 const Cliente = ({cliente}) => {
+  const navigate = useNavigate();
   const {nombre , empresa, email,telefono,id}=cliente;
 
   return (
@@ -20,16 +29,28 @@ const Cliente = ({cliente}) => {
           <button 
                 type="button"
                 className=" text-blue-600  hover:text-blue-700 uppercase font-bold text-xs"
+                onClick={()=>navigate(`/clientes/${id}/editar`)}
           >
             Editar
           </button>
 
-          <button 
-                type="button"
-                className=" text-red-600  hover:text-red-700 uppercase font-bold text-xs"
+          <Form
+           method="post"
+           action={`/clientes/${id}/eliminar`}
+           onSubmit={(e)=>{
+             if(!confirm('Deseas eliminar este registro'))
+             {
+              e.preventDefault();
+             }
+           }}
           >
-            Eliminar
-          </button>
+              <button 
+                    type="submit"
+                    className=" text-red-600  hover:text-red-700 uppercase font-bold text-xs"                
+              >
+                Eliminar
+              </button>
+          </Form>
 
         </td>        
       </tr>
